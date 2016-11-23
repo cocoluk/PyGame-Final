@@ -15,9 +15,21 @@ blue = (0, 0, 255)
 
 block_width = 60
 block_height = 25
+ball_speed = 4
+
+class Paddle(Sprite):
+	def __init__(self):
+		Sprite.__init__(self)
+		#self.image = image.load("paddle.png").convert_alpha() # getting paddle image
+		self.image = pygame.Surface((block_width,block_height))
+		self.image.fill(white)
+		self.rect = self.image.get_rect() 
+    #def update(self, mouse_position):
+
+    #	self.rect.center = mouse.get_pos()
 
 class Block(Sprite):
-	def __init__(self, color = red, width = 80, height = 30):
+	def __init__(self, color = red, width = 80, height = 30): # default block color is red
 		#self.blockwidth = block_width
 		#self.blockheight = block_height
 		Sprite.__init__(self)
@@ -29,14 +41,56 @@ class Block(Sprite):
 	def position(self,x,y):
 		self.rect.x = x
 		self.rect.y = y
+	#def update(self):
+		#if self.rect.collidepoint
+
+
+	# def detect_collision(self, sprite1, sprite2):
+	# 	collide = pygame.sprite.collide_rect(sprite1, sprite2)
+	# 	if collide == True:
+	# 		sprite2
 
 class Ball(Sprite):
 	def __init__(self):
+		self.x = 0
+		self.y = 0
+		self.change_x = 0
+		self.change_y = 0
+		self.size = 10
+		self.color = black
+	def movement(self):
+		self.x += self.change_x
+		self.y += self.change_y
+	def draw(self,screen):
+		pygame.draw.circle(screen,self.color,[self.x,self.y],self.size)
+
+class Boundaries(Sprite):
+	def __init__(self,x,y,width,height):
 		Sprite.__init__(self)
-		self.moving = False
-		self.image = pygame.Surface((12,12))
-		self.image.fill(white)
+		self.image = pygame.Surface((width,height))
+		self.image.fill(black)
 		self.rect = self.image.get_rect()
+	def position(self,x,y):
+		self.rect.y = y
+		self.rect.x = x 
+# class Ball(Sprite):
+# 	speed = 10
+# 	x = 0
+# 	y = 180
+# 	direction = 150
+# 	width = 15
+# 	height = 15
+# 	def __init__(self):
+# 		Sprite.__init__(self)
+# 		#self.moving = False
+# 		self.image = pygame.Surface([self.width,self.height])
+# 		self.image.fill(white)
+# 		self.rect = self.image.get_rect()
+# 	def react(self):
+# 		self.x += self.speed # change position of ball's x and y coordinates based on speed and direction
+# 		self.y += self.speed
+# 		if self.y <= 0:
+# 			self.speed
 
 
 if (__name__ == '__main__'):
@@ -77,6 +131,25 @@ if (__name__ == '__main__'):
 	# now going to draw the block group sprites in the window
 	block_group.draw(gameDisplay) # adding sprites to window surface
 
+	the_ball = Ball()
+	the_ball.x = 410
+	the_ball.y = 500
+	the_ball.change_x = 3
+	the_ball.change_y = 2
+	the_ball.movement()
+	the_ball.draw(gameDisplay)
+
+	#going to make the boundaries now
+	bound_group = pygame.sprite.Group()
+	bound_top = Boundaries(0,0,820,5)
+	bound_bottom = Boundaries(500,100,820,5)
+	bound_group.add(bound_top,bound_bottom)
+
+	bound_group.draw(gameDisplay)
+
+
+
+
 	running = True
 
 	while(running):
@@ -92,16 +165,6 @@ if (__name__ == '__main__'):
 	#def update(self):
 
 
-class Paddle(Sprite):
-	def __init__(self):
-		self.blockwidth = block_width
-		self.blockheight = block_height
-		Sprite.__init__(self)
-		#self.image = image.load("paddle.png").convert_alpha() # getting paddle image
-		self.image = pygame.Surface((self.blockwidth,self.blockheight))
-		self.rect = self.image.get_rect() 
-    #def update(self):
-    #	self.rect.center = mouse.get_pos()
 
 # block = Block()
 # ball = Ball()
@@ -132,17 +195,6 @@ class Paddle(Sprite):
 # 	pygame.quit() # prevents error message in terminal when game shuts down
 
 
-#pygame.display.update()		#only updates portion specified
-
-# # object measurements
-# brick_width = 70
-# brick_height = 20
-# paddle_width = 70
-# paddle_height = 15
-# ball_diameter = 12
-# ball_radius = ball_diameter / 2
-
-# main_paddle = screen
 
 
 
