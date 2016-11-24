@@ -61,6 +61,11 @@ class Ball(Sprite):
 	def movement(self):
 		self.x += self.change_x
 		self.y += self.change_y
+	def update(self):
+		old_x = self.rect.x
+		new_x = old_x + self.change_x
+		self.rect.x = new_x
+		
 	def draw(self,screen):
 		pygame.draw.circle(screen,self.color,[self.x,self.y],self.size)
 
