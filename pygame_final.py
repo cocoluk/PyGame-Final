@@ -147,7 +147,7 @@ if (__name__ == '__main__'):
 	#going to make the boundaries now
 	bound_group = pygame.sprite.Group()
 	bound_top = Boundaries(0,0,820,5) #(x,y,width,height)
-	bound_bottom = Boundaries(500,100,820,5)
+	bound_bottom = Boundaries(500,100,820,5) # (find how to make borders also on side)
 	bound_group.add(bound_top,bound_bottom)
 
 	bound_group.draw(gameDisplay)
