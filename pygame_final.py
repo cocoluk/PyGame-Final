@@ -65,7 +65,7 @@ class Ball(Sprite):
 		old_x = self.rect.x
 		new_x = old_x + self.change_x
 		self.rect.x = new_x
-		
+
 	def draw(self,screen):
 		pygame.draw.circle(screen,self.color,[self.x,self.y],self.size)
 
@@ -146,7 +146,7 @@ if (__name__ == '__main__'):
 
 	#going to make the boundaries now
 	bound_group = pygame.sprite.Group()
-	bound_top = Boundaries(0,0,820,5)
+	bound_top = Boundaries(0,0,820,5) #(x,y,width,height)
 	bound_bottom = Boundaries(500,100,820,5)
 	bound_group.add(bound_top,bound_bottom)
 
