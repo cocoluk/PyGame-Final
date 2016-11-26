@@ -136,8 +136,8 @@ if (__name__ == '__main__'):
 	# now going to draw the block group sprites in the window
 	block_group.draw(gameDisplay) # adding sprites to window surface
 
-	the_ball = Ball()
-	the_ball.x = 410
+	the_ball = Ball() #ball class initiated
+	the_ball.x = 410 # starting x position of ball
 	the_ball.y = 500
 	the_ball.change_x = 3
 	the_ball.change_y = 2
