@@ -54,7 +54,7 @@ class Ball(Sprite):
 	def __init__(self):
 		self.x = 0
 		self.y = 0
-		self.change_x = 0
+		self.change_x = 0 # look up what this does
 		self.change_y = 0
 		self.size = 10
 		self.color = black
@@ -138,8 +138,8 @@ if (__name__ == '__main__'):
 
 	the_ball = Ball() #ball class initiated
 	the_ball.x = 410 # starting x position of ball
-	the_ball.y = 500
-	the_ball.change_x = 3
+	the_ball.y = 500 # starting y position of ball
+	the_ball.change_x = 3 
 	the_ball.change_y = 2
 	the_ball.movement()
 	the_ball.draw(gameDisplay)
