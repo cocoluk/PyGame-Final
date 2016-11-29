@@ -18,12 +18,20 @@ block_height = 25
 ball_speed = 4
 
 class Paddle(Sprite):
-	def __init__(self):
+	def __init__(self, color = red, width = 80, height = 30):
 		Sprite.__init__(self)
 		#self.image = image.load("paddle.png").convert_alpha() # getting paddle image
-		self.image = pygame.Surface((block_width,block_height))
-		self.image.fill(white)
+		self.image = pygame.Surface((width,height))
+		self.image.fill(color)
 		self.rect = self.image.get_rect() 
+		self.screenheight = pygame.display.get_surface().get_height
+		self.screenwidth = pygame.display.get_surface().get_width
+		self.rect.topleft = (0,self.screenheight-self.height)
+   # Update the player)
+	def update(self):
+		self.rect.center = mouse.get_pos()
+		self.rect.left = pos[0]
+		#if self.rect.left > self.scree
     #def update(self, mouse_position):
 
     #	self.rect.center = mouse.get_pos()
@@ -136,6 +144,7 @@ if (__name__ == '__main__'):
 	# now going to draw the block group sprites in the window
 	block_group.draw(gameDisplay) # adding sprites to window surface
 
+
 	the_ball = Ball() #ball class initiated
 	the_ball.x = 410 # starting x position of ball
 	the_ball.y = 500 # starting y position of ball
@@ -151,6 +160,9 @@ if (__name__ == '__main__'):
 	bound_group.add(bound_top,bound_bottom)
 
 	bound_group.draw(gameDisplay)
+
+	main_player = Paddle()
+	main_player.draw(gameDisplay)
 
 
 
