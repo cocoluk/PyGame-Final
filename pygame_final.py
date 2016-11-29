@@ -86,6 +86,7 @@ class Boundaries(Sprite):
 	def position(self,x,y):
 		self.rect.y = y
 		self.rect.x = x 
+
 # class Ball(Sprite):
 # 	speed = 10
 # 	x = 0
@@ -118,7 +119,7 @@ if (__name__ == '__main__'):
 
 	# now start initializing things in the window
 
-	# 3 ROWS OF BLOCKS ARE GOING TO BE CREATED
+	# 3 ROWS OF BLOCKS ARE GOING TO BE CREATED - block placement
 
 	block_group = pygame.sprite.Group()
 	one_block = Block()
