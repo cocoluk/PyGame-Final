@@ -213,6 +213,71 @@ if (__name__ == '__main__'):
 # 	pygame.quit() # prevents error message in terminal when game shuts down
 
 
+import pygame
+#from pygame import *
+from pygame.sprite import *
+from random import *
+
+
+#create colors
+white = (255,255,255)
+black = (0,0,0)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+
+class Borders(Sprite):
+	def __init__(self,x,y,height,width,color):
+		Sprite.__init__(self)
+		self.image = pygame.Surface([width,height])
+		self.image.fill(color)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+#use bitmap for images
+
+class Player(Sprite):
+	change_x = 10
+	change_y = 10
+	speed = 2
+	def __init__(self,x,y):
+		Sprite.__init__(self)
+		self.image = pygame.Surface([30,30])
+		self.image.fill(black)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+	def change_speed(self,x,y):
+		self.change_x += x
+		self.change_y += y 
+	def movement(self,borders):
+		self.rect.x += self.change_x # update position based on change (move left and right)
+		borders_hit = Sprite.spritecollide(self,borders,False)
+		for border in borders_hit:
+			if self.change_x > 0: # if moved right, place right side to hit object's left
+				self.rect.right = border.rect.left
+			else:
+				self.rect.left = border.rect.right # if moved left, place left side to hit object's right
+		self.rect.y += self.change_y
+		borders_hit = Sprite.spritecollide(self,borders,False)
+		for border in borders_hit:
+			if self.change_y > 0:
+				self.rect.bottom = border.rect.top
+			else:
+				self.rect.top = border.rect.bottom
+
+class Maze_Base():
+	borders = None
+	enemies = None
+
+	def __init__(self):
+		self.borders = Sprite.Group()
+		self.enemies = Sprite.Group()
+
+
+
+
 
 
 
