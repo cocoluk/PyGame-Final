@@ -17,46 +17,34 @@ block_width = 60
 block_height = 25
 ball_speed = 4
 
+class Block(Sprite):
+	def __init__(self):
+		self.block_width = block_width
+		self.block_height = block_height
+		Sprite.__init__(self)
+		self.image = pygame.Surface((self.block_width, self.block_height))
+		self.image.fill(red)
+		self.rect = self.image.get_rect()
+		self.name = block
+
 class Paddle(Sprite):
-	def __init__(self, color = red, width = 80, height = 30):
+	def __init__(self):
 		Sprite.__init__(self)
 		#self.image = image.load("paddle.png").convert_alpha() # getting paddle image
-		self.image = pygame.Surface((width,height))
-		self.image.fill(color)
+		self.image = pygame.Surface((paddle_width,paddle_height))
+		self.image.fill(green)
 		self.rect = self.image.get_rect() 
-		self.screenheight = pygame.display.get_surface().get_height
-		self.screenwidth = pygame.display.get_surface().get_width
-		self.rect.topleft = (0,self.screenheight-self.height)
+		self.name = paddle
    # Update the player)
-	def update(self):
-		self.rect.center = mouse.get_pos()
-		self.rect.left = pos[0]
-		#if self.rect.left > self.scree
-    #def update(self, mouse_position):
+	def update(self,mouse_x,*args):
+		if self.rect.x >= 0:
+			if self.rect.right <= screen_width:
+				self.rect.centerx = mouse_x
+		if self.rect.x < 0:
+			self.rect.x = 0
+		elif self.rect.right > screen_width:
+			self.rect.right = screen_width
 
-    #	self.rect.center = mouse.get_pos()
-
-class Block(Sprite):
-	def __init__(self, color = red, width = 80, height = 30): # default block color is red
-		#self.blockwidth = block_width
-		#self.blockheight = block_height
-		Sprite.__init__(self)
-		#self.image = pygame.Surface((self.block_width,self.block_height))
-		self.image = pygame.Surface((width,height))
-		self.image.fill(color)
-		self.rect = self.image.get_rect()
-		#self.name = Block
-	def position(self,x,y):
-		self.rect.x = x
-		self.rect.y = y
-	#def update(self):
-		#if self.rect.collidepoint
-
-
-	# def detect_collision(self, sprite1, sprite2):
-	# 	collide = pygame.sprite.collide_rect(sprite1, sprite2)
-	# 	if collide == True:
-	# 		sprite2
 
 class Ball(Sprite):
 	def __init__(self):
@@ -263,43 +251,6 @@ class Borders(Sprite):
 
 #use bitmap for images
 
-class Player(Sprite):
-	change_x = 10
-	change_y = 10
-	speed = 2
-	def __init__(self,x,y):
-		Sprite.__init__(self)
-		self.image = pygame.Surface([30,30])
-		self.image.fill(black)
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-	def change_speed(self,x,y):
-		self.change_x += x
-		self.change_y += y 
-	def movement(self,borders):
-		self.rect.x += self.change_x # update position based on change (move left and right)
-		borders_hit = Sprite.spritecollide(self,borders,False)
-		for border in borders_hit:
-			if self.change_x > 0: # if moved right, place right side to hit object's left
-				self.rect.right = border.rect.left
-			else:
-				self.rect.left = border.rect.right # if moved left, place left side to hit object's right
-		self.rect.y += self.change_y
-		borders_hit = Sprite.spritecollide(self,borders,False)
-		for border in borders_hit:
-			if self.change_y > 0:
-				self.rect.bottom = border.rect.top
-			else:
-				self.rect.top = border.rect.bottom
-
-class Maze_Base():
-	borders = None
-	enemies = None
-
-	def __init__(self):
-		self.borders = Sprite.Group()
-		self.enemies = Sprite.Group()
 
 
 
