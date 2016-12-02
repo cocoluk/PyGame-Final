@@ -1,6 +1,7 @@
 #template
 
 import pygame
+import sys
 from pygame import *
 from pygame.sprite import *
 from random import *
@@ -12,10 +13,25 @@ black = (0,0,0)
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
+yellow = (255, 255, 0)
 
-block_width = 60
+background = white
+block_space = 2 # space in between blocks
+block_width = 62
 block_height = 25
-ball_speed = 4
+layout_width = 20 # block organization dimensions
+layout_height = 10
+ball_radius = 20
+ball_color = red
+paddle_width = 65
+paddle_height = 5
+block = 'block'
+ball = 'ball'
+paddle = 'paddle'
+ball_speed = 10
+
+screen_width = 640
+screen_height = 480
 
 class Block(Sprite):
 	def __init__(self):
@@ -32,7 +48,7 @@ class Paddle(Sprite):
 		Sprite.__init__(self)
 		#self.image = image.load("paddle.png").convert_alpha() # getting paddle image
 		self.image = pygame.Surface((paddle_width,paddle_height))
-		self.image.fill(green)
+		self.image.fill(black)
 		self.rect = self.image.get_rect() 
 		self.name = paddle
    # Update the player)
@@ -45,213 +61,149 @@ class Paddle(Sprite):
 		elif self.rect.right > screen_width:
 			self.rect.right = screen_width
 
-
 class Ball(Sprite):
+	def __init__(self,display_surface):
+		Sprite.__init__(self)
+		self.name = ball
+		self.moving = False
+		self.image = pygame.Surface((15,15))
+		self.image.fill(red)
+		self.rect = self.image.get_rect()
+		self.vectorx = ball_speed # vectors to represent speed and angle
+		self.vectory = ball_speed * -1
+		self.score = 0
+	def update(self,mouse_x,blocks,paddle,*args): # need *args to pass arbitrary amount of arguments
+		if self.moving == False: # if ball is not moving
+			self.rect.centerx = mouse_x # position of ball follows mouse
+		else:
+			self.rect.y = self.rect.y + self.vectory # ball y position - 10
+			collisions = pygame.sprite.Group(paddle,blocks) # list of things that ball can collide with, contains our paddle and blocks
+			hit_sprites = pygame.sprite.spritecollide(self,collisions,False) # required so paddle still exists after ball hits paddle for the first time
+			if len(hit_sprites) > 0: # if the ball hits something
+				for sprite in hit_sprites: # for the sprites in our list containing the blocks and paddle
+					if sprite.name == block: # if the ball hit a block
+						sprite.kill() # get rid of the block that was just hit
+						self.score = self.score + 1 # increase score by 1
+				self.vectory = self.vectory * -1 # ball speed * -1 = -10 * -1 = 10 new position
+				self.rect.y += self.vectory
+				#print("5")
+			self.rect.x += self.vectorx
+			hit_blocks = pygame.sprite.spritecollide(self,blocks,True) # see if sprite block collided with blocks group, True removes block from group
+			if len(hit_blocks) > 0: # if the list of colliding sprites is greater than 0
+				self.vectorx *= -1  # return ball at ball speed, simulate it being bounced backwards towards the paddle
+				self.score += 1
+				#print("1")
+			elif self.rect.right > screen_width: #if ball's right side is off the screen
+				self.vectorx *= -1 #
+				self.rect.right = screen_width #bring the ball's right side back to the screen width dimensions so it stays within game window
+				#print("2")
+			elif self.rect.left < 0: # if the left side of the ball is off the screen
+				self.vectorx *= -1 # bring back so ball moves towards right (+ goes right, - goes left)
+				self.rect.left = 0 # position the left side of the ball 
+				#print("3")
+			elif self.rect.top < 0:
+				self.vectory *= -1
+				self.rect.top = 0
+				#print("4")
+			elif self.rect.top > screen_height-5:
+				print ("So close, play again!")
+				pygame.display.quit()
+				pygame.quit()
+				sys.exit()
+class Score(object):
 	def __init__(self):
-		self.x = 0
-		self.y = 0
-		self.change_x = 0 # look up what this does
-		self.change_y = 0
-		self.size = 10
-		self.color = black
-	def movement(self):
-		self.x += self.change_x
-		self.y += self.change_y
-	#def update(self):
-		old_x = self.rect.x
-		new_x = old_x + self.change_x
-		self.rect.x = new_x
-	def update(self, mousex, blocks, paddle, *args):
-        if self.moving == False:
-            self.rect.centerx = mousex
+		self.score = 0
+		self.font = pygame.font.Font(None,25)
+		self.render = self.font.render('Score = ' + str(self.score), True, blue, white) #score, text color, background color
+		self.rect = self.render.get_rect()
+		self.rect.x = 0
+		self.rect.bottom = screen_height
 
-        else:
-            self.rect.y += self.vectory
-
-            hitGroup = pygame.sprite.Group(paddle, blocks)
-
-            spriteHitList = pygame.sprite.spritecollide(self, hitGroup, False)
-            if len(spriteHitList) > 0:
-                for sprite in spriteHitList:
-                    if sprite.name == BLOCK:
-                        sprite.kill()
-                        self.score += 1
-                self.vectory *= -1
-                self.rect.y += self.vectory
-            
-            self.rect.x += self.vectorx
-            
-            blockHitList = pygame.sprite.spritecollide(self, blocks, True)
-                
-            if len(blockHitList) > 0:
-                self.vectorx *= -1
-                self.score += 1
-
-
-	def draw(self,screen):
-		pygame.draw.circle(screen,self.color,[self.x,self.y],self.size)
-
-class Boundaries(Sprite):
-	def __init__(self,x,y,width,height):
-		Sprite.__init__(self)
-		self.image = pygame.Surface((width,height))
-		self.image.fill(black)
-		self.rect = self.image.get_rect()
-	def position(self,x,y):
-		self.rect.y = y
-		self.rect.x = x 
-
-# class Ball(Sprite):
-# 	speed = 10
-# 	x = 0
-# 	y = 180
-# 	direction = 150
-# 	width = 15
-# 	height = 15
-# 	def __init__(self):
-# 		Sprite.__init__(self)
-# 		#self.moving = False
-# 		self.image = pygame.Surface([self.width,self.height])
-# 		self.image.fill(white)
-# 		self.rect = self.image.get_rect()
-# 	def react(self):
-# 		self.x += self.speed # change position of ball's x and y coordinates based on speed and direction
-# 		self.y += self.speed
-# 		if self.y <= 0:
-# 			self.speed
-
-
-if (__name__ == '__main__'):
-	pygame.init()
-
-	gameDisplay = pygame.display.set_mode((820,600)) #initialize with a tuple
-	#lets add a title, aka "caption"
-	pygame.display.set_caption("Those Darn Blocks")
-	gameDisplay.fill(white)
-	clock = pygame.time.Clock()
-	frames_per_second = 60
-
-	# now start initializing things in the window
-
-	# 3 ROWS OF BLOCKS ARE GOING TO BE CREATED - block placement
-
-	block_group = pygame.sprite.Group()
-	one_block = Block()
-	one_block.position(10,10)
-	two_block = Block(blue)
-	two_block.position(10,50)
-	three_block = Block(green)
-	three_block.position(10,90)
-	block_group.add(one_block,two_block, three_block)
-
-	block_count = 9
-	counting = 0
-	for column in range(0,block_count):
-		counting += 90
-		block1 = Block()
-		block1.position(10+counting,10)
-		block2 = Block(blue)
-		block2.position(10+counting,50)
-		block3 = Block(green)
-		block3.position(10+counting,90)
-		block_group.add(block1,block2,block3)
-
-	# now going to draw the block group sprites in the window
-	block_group.draw(gameDisplay) # adding sprites to window surface
-
-
-	the_ball = Ball() #ball class initiated
-	the_ball.x = 410 # starting x position of ball
-	the_ball.y = 500 # starting y position of ball
-	the_ball.change_x = 3 
-	the_ball.change_y = 2
-	the_ball.movement()
-	the_ball.draw(gameDisplay)
-
-	#going to make the boundaries now
-	bound_group = pygame.sprite.Group()
-	bound_top = Boundaries(0,0,820,5) #(x,y,width,height)
-	bound_bottom = Boundaries(500,100,820,5) # (find how to make borders also on side)
-	bound_group.add(bound_top,bound_bottom)
-
-	bound_group.draw(gameDisplay)
-
-	main_player = Paddle()
-	main_player.draw(gameDisplay)
-
-
-
-
-	running = True
-
-	while(running):
+class Game(object):
+	def __init__(self):
+		pygame.init()
+		pygame.mixer.music.load('music.wav')
+		pygame.mixer.music.play(-1,0)
+		self.display_surface, self.display_rect = self.create_screen()
+		self.mouse_x = 0
+		self.blocks = self.create_blocks()
+		self.paddle = self.create_paddle()
+		self.ball = self.create_ball()
+		self.score = Score()
+		self.all_sprites = pygame.sprite.Group(self.blocks,self.paddle,self.ball)
+	def create_screen(self):
+		pygame.display.set_caption('Get Those Blocks')
+		display_surface = pygame.display.set_mode((screen_width,screen_height))
+		display_rect = display_surface.get_rect()
+		display_surface.fill(background)
+		#font = pygame.font.Font(None,36)
+		#text = font.render("Press Space to Play",1,(10,10,10))
+		#text_position = text.get_rect()
+		#text_position.centerx = 20
+		#text_position.bottom = screen_height
+		display_surface.convert()
+		return display_surface, display_rect
+	def update_score_instructions(self): #from score class
+		self.score.score = self.ball.score # get the score from the score defined in ball class
+		self.score.render = self.score.font.render('Press the Space Bar to Start, Control with Mouse                             Score = ' + str(self.score.score), True, blue, white)
+		self.score.rect = self.score.render.get_rect()
+		self.score.rect.x = 0
+		self.score.rect.bottom = screen_height
+	def create_blocks(self):
+		blocks_group = pygame.sprite.Group()
+		for y in range(layout_height):
+			for x in range(layout_width):
+				block = Block() # create blocks using Block class
+				block.rect.x = x * (block_width+block_space) # block x position equals x of layout width times set block width plus block space
+				block.rect.y = y * (block_height+block_space) # block y position equals y of layout height times block height plus block space
+				block.color = self.block_color(block,y,x)
+				block.image.fill(block.color)
+				blocks_group.add(block)
+		return blocks_group
+	def block_color(self,block,row,column):
+		if row == 0:
+			return green
+		if row % 2 == 0:
+			return green
+		#if column == 0:
+			#return green
+		#if column % 2 == 0:
+			#return green
+		else:
+			return blue
+	def create_paddle(self):
+		paddle = Paddle()
+		paddle.rect.centerx = self.display_rect.centerx
+		paddle.rect.bottom = self.display_rect.bottom
+		return paddle
+	def create_ball(self):
+		ball = Ball(self.display_surface)
+		ball.rect.centerx = self.paddle.rect.centerx
+		ball.rect.bottom = self.paddle.rect.top
+		return ball
+	def event_detection(self):
 		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				running = False
-		clock.tick(frames_per_second)
-		pygame.display.update()
+			if event.type == QUIT:
+				pygame.quit()
+				sys.exit()
+			if event.type == MOUSEMOTION:
+				self.mouse_x = event.pos[0]
+			elif event.type == KEYUP:
+				if event.key == K_SPACE:
+					self.ball.moving = True
+	def run_game(self):
+		while True:
+			self.display_surface.fill(background)
+			self.update_score_instructions()
+			self.display_surface.blit(self.score.render,self.score.rect)
+			self.all_sprites.update(self.mouse_x,self.blocks,self.paddle)
+			self.all_sprites.draw(self.display_surface)
+			pygame.display.update()
+			self.event_detection()
 
-	pygame.quit()	
-
-
-	#def update(self):
-
-
-
-# block = Block()
-# ball = Ball()
-# paddle = Paddle()
-
-# sprites = RenderPlain(block, ball, paddle)
-
-
-
-# def main():
-# 	pygame.init();
-
-# 	gameDisplay = pygame.display.set_mode((800,600))
-
-# 	clock = pygame.time.Clock() # calling clock object
-
-# 	running = True
-
-# 	while running:
-# 		clock.tick(65)
-# 		for event in pygame.event.get():
-# 			if event.type == QUIT:
-# 				pygame.quit()
-# 				running = False
-# 		screen.fill((0,0,0)) 
-# 		pygame.display.flip() # update to different screen
-
-# 	pygame.quit() # prevents error message in terminal when game shuts down
-
-
-import pygame
-#from pygame import *
-from pygame.sprite import *
-from random import *
-
-
-#create colors
-white = (255,255,255)
-black = (0,0,0)
-red = (255, 0, 0)
-green = (0, 255, 0)
-blue = (0, 0, 255)
-
-class Borders(Sprite):
-	def __init__(self,x,y,height,width,color):
-		Sprite.__init__(self)
-		self.image = pygame.Surface([width,height])
-		self.image.fill(color)
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-
-#use bitmap for images
-
-
+if __name__ == '__main__':
+	play_game = Game()
+	play_game.run_game()
 
 
 
