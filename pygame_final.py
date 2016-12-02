@@ -69,10 +69,36 @@ class Ball(Sprite):
 	def movement(self):
 		self.x += self.change_x
 		self.y += self.change_y
-	def update(self):
+	#def update(self):
 		old_x = self.rect.x
 		new_x = old_x + self.change_x
 		self.rect.x = new_x
+	def update(self, mousex, blocks, paddle, *args):
+        if self.moving == False:
+            self.rect.centerx = mousex
+
+        else:
+            self.rect.y += self.vectory
+
+            hitGroup = pygame.sprite.Group(paddle, blocks)
+
+            spriteHitList = pygame.sprite.spritecollide(self, hitGroup, False)
+            if len(spriteHitList) > 0:
+                for sprite in spriteHitList:
+                    if sprite.name == BLOCK:
+                        sprite.kill()
+                        self.score += 1
+                self.vectory *= -1
+                self.rect.y += self.vectory
+            
+            self.rect.x += self.vectorx
+            
+            blockHitList = pygame.sprite.spritecollide(self, blocks, True)
+                
+            if len(blockHitList) > 0:
+                self.vectorx *= -1
+                self.score += 1
+
 
 	def draw(self,screen):
 		pygame.draw.circle(screen,self.color,[self.x,self.y],self.size)
