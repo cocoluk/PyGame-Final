@@ -21,8 +21,6 @@ block_width = 62
 block_height = 25
 layout_width = 20 # block organization dimensions
 layout_height = 10
-ball_radius = 20
-ball_color = red
 paddle_width = 65
 paddle_height = 5
 block = 'block'
@@ -66,7 +64,7 @@ class Ball(Sprite):
 		Sprite.__init__(self)
 		self.name = ball
 		self.moving = False
-		self.image = pygame.Surface((15,15))
+		self.image = pygame.Surface((10,10))
 		self.image.fill(red)
 		self.rect = self.image.get_rect()
 		self.vectorx = ball_speed # vectors to represent speed and angle
@@ -132,7 +130,7 @@ class Game(object):
 		self.score = Score()
 		self.all_sprites = pygame.sprite.Group(self.blocks,self.paddle,self.ball)
 	def create_screen(self):
-		pygame.display.set_caption('Get Those Blocks')
+		pygame.display.set_caption('Destroy Those Blocks!')
 		display_surface = pygame.display.set_mode((screen_width,screen_height))
 		display_rect = display_surface.get_rect()
 		display_surface.fill(background)
