@@ -26,10 +26,11 @@ paddle_height = 5
 block = 'block'
 ball = 'ball'
 paddle = 'paddle'
-ball_speed = 10
+ball_speed = 8.5
 
 screen_width = 640
 screen_height = 480
+
 
 class Block(Sprite):
 	def __init__(self):
@@ -50,14 +51,15 @@ class Paddle(Sprite):
 		self.rect = self.image.get_rect() 
 		self.name = paddle
    # Update the player)
-	def update(self,mouse_x,*args):
+	def update(self,mouse_x,*args): # only deals with x postion because only suppose to be moving horizontally
 		if self.rect.x >= 0:
-			if self.rect.right <= screen_width:
-				self.rect.centerx = mouse_x
-		if self.rect.x < 0:
-			self.rect.x = 0
-		elif self.rect.right > screen_width:
-			self.rect.right = screen_width
+			if self.rect.right <= screen_width: # paddle within boundaries
+				self.rect.centerx = mouse_x # set paddle center coordinates to mouse's current coordinates
+		if self.rect.x < 0: # if paddle gets off screen
+			self.rect.x = 0 # move back on screen
+		elif self.rect.right > screen_width: # paddle's right side further than screen width (gets off screen)
+			self.rect.right = screen_width # move back on screen
+			#ultimately creating boundaries for paddle to move within
 
 class Ball(Sprite):
 	def __init__(self,display_surface):
@@ -67,8 +69,8 @@ class Ball(Sprite):
 		self.image = pygame.Surface((10,10))
 		self.image.fill(red)
 		self.rect = self.image.get_rect()
-		self.vectorx = ball_speed # vectors to represent speed and angle
-		self.vectory = ball_speed * -1
+		self.vectorx = ball_speed # vectors to represent speed and angle move right
+		self.vectory = ball_speed * -1 # move left
 		self.score = 0
 	def update(self,mouse_x,blocks,paddle,*args): # need *args to pass arbitrary amount of arguments
 		if self.moving == False: # if ball is not moving
@@ -80,6 +82,8 @@ class Ball(Sprite):
 			if len(hit_sprites) > 0: # if the ball hits something
 				for sprite in hit_sprites: # for the sprites in our list containing the blocks and paddle
 					if sprite.name == block: # if the ball hit a block
+						#pygame.mixer.music.load('hit.wav')
+						#pygame.mixer.music.play(-1,0)
 						sprite.kill() # get rid of the block that was just hit
 						self.score = self.score + 1 # increase score by 1
 				self.vectory = self.vectory * -1 # ball speed * -1 = -10 * -1 = 10 new position
@@ -99,7 +103,7 @@ class Ball(Sprite):
 				self.vectorx *= -1 # bring back so ball moves towards right (+ goes right, - goes left)
 				self.rect.left = 0 # position the left side of the ball 
 				#print("3")
-			elif self.rect.top < 0:
+			elif self.rect.top < 0: 
 				self.vectory *= -1
 				self.rect.top = 0
 				#print("4")
@@ -108,6 +112,7 @@ class Ball(Sprite):
 				pygame.display.quit()
 				pygame.quit()
 				sys.exit()
+
 class Score(object):
 	def __init__(self):
 		self.score = 0
@@ -123,7 +128,7 @@ class Game(object):
 		pygame.mixer.music.load('music.wav')
 		pygame.mixer.music.play(-1,0)
 		self.display_surface, self.display_rect = self.create_screen()
-		self.mouse_x = 0
+		self.mouse_x = 0 # starting mouse position
 		self.blocks = self.create_blocks()
 		self.paddle = self.create_paddle()
 		self.ball = self.create_ball()
@@ -149,7 +154,7 @@ class Game(object):
 		self.score.rect.bottom = screen_height
 	def create_blocks(self):
 		blocks_group = pygame.sprite.Group()
-		for y in range(layout_height):
+		for y in range(layout_height): # assembling blocks within the layout specified above
 			for x in range(layout_width):
 				block = Block() # create blocks using Block class
 				block.rect.x = x * (block_width+block_space) # block x position equals x of layout width times set block width plus block space
@@ -161,12 +166,26 @@ class Game(object):
 	def block_color(self,block,row,column):
 		if row == 0:
 			return green
-		if row % 2 == 0:
+		if row == 1:
+			return yellow
+		if row == 2:
+			return red
+		if row == 3:
+			return blue
+		if row == 4:
 			return green
-		#if column == 0:
-			#return green
-		#if column % 2 == 0:
-			#return green
+		if row == 5:
+			return yellow
+		if row == 6:
+			return red
+		if row == 7:
+			return blue
+		if row == 8:
+			return green
+		if row == 9:
+			return yellow
+		if row == 10:
+			return red
 		else:
 			return blue
 	def create_paddle(self):
@@ -177,7 +196,7 @@ class Game(object):
 	def create_ball(self):
 		ball = Ball(self.display_surface)
 		ball.rect.centerx = self.paddle.rect.centerx
-		ball.rect.bottom = self.paddle.rect.top
+		ball.rect.bottom = self.paddle.rect.top # place bottom of ball on top of paddle for starting position
 		return ball
 	def event_detection(self):
 		for event in pygame.event.get():
