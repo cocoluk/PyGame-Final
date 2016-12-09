@@ -125,7 +125,7 @@ class Score(object):
 class Game(object):
 	def __init__(self):
 		pygame.init()
-		pygame.mixer.music.load('music.wav')
+		pygame.mixer.music.load('music.wav') # has to be a .wav file 
 		pygame.mixer.music.play(-1,0)
 		self.display_surface, self.display_rect = self.create_screen()
 		self.mouse_x = 0 # starting mouse position
